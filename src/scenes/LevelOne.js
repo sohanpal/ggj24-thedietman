@@ -3,9 +3,6 @@ import { Scene } from "phaser";
 export class LevelOne extends Scene {
   cursors;
   player;
-  player_s;
-  player_l;
-
   explosion;
   platforms;
   timedEvent;
@@ -13,6 +10,7 @@ export class LevelOne extends Scene {
   healthyPool = [];
   unhealthyPool = [];
   active = []; // Initialize active as an empty array
+  score = 0;
 
   constructor() {
     super("LevelOne");
@@ -54,42 +52,30 @@ export class LevelOne extends Scene {
       hideOnComplete: true,
     });
 
+    this.createAnimationPerson("dude_s");
+  }
+
+  createAnimationPerson(dudeSize) {
+    this.anims.remove("left");
+    this.anims.remove("right");
+    this.anims.remove("turn");
+
     this.anims.create({
       key: "left",
-      frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers(dudeSize, { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1,
     });
 
     this.anims.create({
       key: "turn",
-      frames: [{ key: "dude", frame: 4 }],
+      frames: [{ key: dudeSize, frame: 4 }],
       frameRate: 20,
     });
 
     this.anims.create({
       key: "right",
-      frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "left_l",
-      frames: this.anims.generateFrameNumbers("dude_l", { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "turn_l",
-      frames: [{ key: "dude_l", frame: 4 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: "right_l",
-      frames: this.anims.generateFrameNumbers("dude_l", { start: 5, end: 8 }),
+      frames: this.anims.generateFrameNumbers(dudeSize, { start: 5, end: 8 }),
       frameRate: 10,
       repeat: -1,
     });
@@ -126,9 +112,7 @@ export class LevelOne extends Scene {
   }
 
   createPlayer() {
-    this.player_s = this.physics.add.sprite(100, 550, "dude");
-    //this.player_l = this.physics.add.sprite(100, 550, "dude_l");
-    this.player = this.player_s;
+    this.player = this.physics.add.sprite(100, 550, "dude");
     this.player.setCollideWorldBounds(true);
   }
 
@@ -146,11 +130,11 @@ export class LevelOne extends Scene {
     const { left, right } = this.cursors;
 
     if (left.isDown) {
-      this.player.setVelocityX(-160);
+      this.player.setVelocityX(-300);
       this.player.anims.play("left", true);
       this.playWalkSound();
     } else if (right.isDown) {
-      this.player.setVelocityX(160);
+      this.player.setVelocityX(300);
       this.player.anims.play("right", true);
       this.playWalkSound();
     } else {
@@ -233,20 +217,22 @@ export class LevelOne extends Scene {
 
   collectHealthyFood(player, food) {
     console.log("Collected healthy food");
-    this.player = this.physics.remove.sprite(100, 550, "dude");
-    this.player = this.physics.add.sprite(100, 550, "dude_l");
     if (!this.eating.isPlaying) {
+      this.score--;
       this.eating.play();
+      this.createAnimationPerson("dude_s");
     }
-    //this.explosion.copyPosition(food).play('eaten');
     this.recycleFood(food);
   }
 
   collectUnhealthyFood(player, food) {
     console.log("Collected unhealthy food");
+
     this.explosion.copyPosition(food).play("eaten");
     if (!this.burp.isPlaying) {
+      this.score++;
       this.burp.play();
+      this.createAnimationPerson("dude_l");
     }
     this.recycleFood(food);
   }

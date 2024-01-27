@@ -42,7 +42,12 @@ export class Preloader extends Scene {
       endFrame: 23,
     });
 
-    this.load.spritesheet("dude", "dude_m.png", {
+    this.load.spritesheet("dude_s", "dude_s.png", {
+      frameWidth: 128,
+      frameHeight: 192,
+    });
+
+    this.load.spritesheet("dude_m", "dude_m.png", {
       frameWidth: 128,
       frameHeight: 192,
     });
