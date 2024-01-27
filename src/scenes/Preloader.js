@@ -27,10 +27,12 @@ export class Preloader extends Scene {
     this.load.setPath("assets");
     this.load.image("logo", "logo.png");
     this.load.image("scene_1", "scene_1.png");
-    this.load.image("bomb", "bomb.png");
     this.load.image("pizza", "Pizza.png");
     this.load.image("bread", "Bread.png");
-    this.load.image("chips", "Chips.png");
+    this.load.image("chips", "chips.png");
+    this.load.image("apple", "apple.png");
+    this.load.image("donut", "donut.png");
+    this.load.image("watermelon", "watermelon.png");
     this.load.image("bananas", "Bananas.png");
     this.load.image("milk", "Milk.png");
     this.load.image("ground", "platform.png");
