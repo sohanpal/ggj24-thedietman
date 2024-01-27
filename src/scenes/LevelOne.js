@@ -112,7 +112,7 @@ export class LevelOne extends Scene {
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(100, 550, "dude");
+    this.player = this.physics.add.sprite(100, 550, "dude_s");
     this.player.setCollideWorldBounds(true);
   }
 
@@ -220,7 +220,7 @@ export class LevelOne extends Scene {
     if (!this.eating.isPlaying) {
       this.score--;
       this.eating.play();
-      this.createAnimationPerson("dude_s");
+      this.handleDudeSize();
     }
     this.recycleFood(food);
   }
@@ -232,9 +232,20 @@ export class LevelOne extends Scene {
     if (!this.burp.isPlaying) {
       this.score++;
       this.burp.play();
-      this.createAnimationPerson("dude_l");
+      this.handleDudeSize();
     }
     this.recycleFood(food);
+  }
+
+  handleDudeSize() {
+    console.log(this.score);
+    if (this.score < 3) {
+      this.createAnimationPerson("dude_s");
+    } else if (this.score > 2 && this.score < 4) {
+      this.createAnimationPerson("dude_m");
+    } else if (this.score > 4) {
+      this.createAnimationPerson("dude_l");
+    }
   }
 
   recycleFood(food) {
