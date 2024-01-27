@@ -2,6 +2,7 @@ import { Boot } from './scenes/Boot';
 import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
+import { LevelOne } from './scenes/LevelOne';
 import { Preloader } from './scenes/Preloader';
 
 //  Find out more information about the Game Config at:
@@ -20,9 +21,17 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
+        LevelOne,
         Game,
         GameOver
-    ]
+    ],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true,
+            gravity: { y: 800 }
+        }
+    },
 };
 
 export default new Phaser.Game(config);
