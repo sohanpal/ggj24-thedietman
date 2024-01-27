@@ -1,189 +1,262 @@
 import { Scene } from "phaser";
 
 export class LevelOne extends Scene {
-    cursors;
-    player;
-    explosion;
-    platforms;
-    healthyPool = [];
-    unhealthyPool = [];
-    active = []; // Initialize active as an empty array
+  cursors;
+  player;
+  player_s;
+  player_l;
 
-    constructor() {
-        super("LevelOne");
+  explosion;
+  platforms;
+  timedEvent;
+  text;
+  healthyPool = [];
+  unhealthyPool = [];
+  active = []; // Initialize active as an empty array
+
+  constructor() {
+    super("LevelOne");
+  }
+
+  create() {
+    this.createAnimations();
+    this.createSoundEffects();
+    this.createBackground();
+    this.createPlatforms();
+    this.createPlayer();
+    this.createExplosion();
+    this.createPool();
+
+    //  Every 250ms we'll release an food
+    this.time.addEvent({
+      delay: 250,
+      callback: () => this.releaseFood(),
+      loop: true,
+    });
+    this.createTimer();
+    this.handleFoodCollisions();
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  update() {
+    this.handlePlayerMovement();
+    this.checkFoodBounds();
+    this.updateTimer();
+  }
+
+  createAnimations() {
+    this.anims.create({
+      key: "eaten",
+      frames: "boom",
+      frameRate: 20,
+      showOnStart: true,
+      hideOnComplete: true,
+    });
+
+    this.anims.create({
+      key: "left",
+      frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "turn",
+      frames: [{ key: "dude", frame: 4 }],
+      frameRate: 20,
+    });
+
+    this.anims.create({
+      key: "right",
+      frames: this.anims.generateFrameNumbers("dude", { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "left_l",
+      frames: this.anims.generateFrameNumbers("dude_l", { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "turn_l",
+      frames: [{ key: "dude_l", frame: 4 }],
+      frameRate: 20,
+    });
+
+    this.anims.create({
+      key: "right_l",
+      frames: this.anims.generateFrameNumbers("dude_l", { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+  }
+
+  createTimer() {
+    this.text = this.add.text(32, 32);
+
+    this.timedEvent = this.time.addEvent({
+      delay: 30000,
+      callback: () => this.nextScene(),
+      callbackScope: this,
+      loop: true,
+    });
+  }
+  updateTimer() {
+    this.text.setText(
+      `Timer: ${this.timedEvent.getRemainingSeconds().toFixed(1)} seconds`
+    );
+  }
+  createSoundEffects() {
+    this.walk = this.sound.add("walk", { volume: 0.1 });
+    this.eating = this.sound.add("humm");
+    this.burp = this.sound.add("burp");
+  }
+
+  createBackground() {
+    this.add.image(512, 340, "scene_1");
+  }
+
+  createPlatforms() {
+    this.platforms = this.physics.add.staticGroup();
+    this.platforms.create(500, 768, "ground").setScale(3).refreshBody();
+  }
+
+  createPlayer() {
+    this.player_s = this.physics.add.sprite(100, 550, "dude");
+    //this.player_l = this.physics.add.sprite(100, 550, "dude_l");
+    this.player = this.player_s;
+    this.player.setCollideWorldBounds(true);
+  }
+
+  createExplosion() {
+    this.explosion = this.add.sprite(0, 0, "boom").setVisible(true);
+  }
+
+  playWalkSound() {
+    if (!this.walk.isPlaying) {
+      this.walk.play();
     }
+  }
 
-    create() {
-        this.createAnimations();
-        this.createSoundEffects();
-        this.createBackground();
-        this.createPlatforms();
-        this.createPlayer();
-        this.createExplosion();
-        this.createPool();
+  handlePlayerMovement() {
+    const { left, right } = this.cursors;
 
-        //  Every 250ms we'll release an food
-        this.time.addEvent({
-            delay: 250,
-            callback: () => this.releaseFood(),
-            loop: true,
-        });
-
-        this.handleFoodCollisions();
-
-        this.cursors = this.input.keyboard.createCursorKeys();
+    if (left.isDown) {
+      this.player.setVelocityX(-160);
+      this.player.anims.play("left", true);
+      this.playWalkSound();
+    } else if (right.isDown) {
+      this.player.setVelocityX(160);
+      this.player.anims.play("right", true);
+      this.playWalkSound();
+    } else {
+      this.player.setVelocityX(0);
+      this.player.anims.play("turn");
     }
+  }
 
-    update() {
-        this.handlePlayerMovement();
-        this.checkFoodBounds();
-    }
+  checkFoodBounds() {
+    const { world } = this.physics;
+    for (let i = this.active.length - 1; i >= 0; i--) {
+      const food = this.active[i];
 
-    createAnimations() {
-
-        this.anims.create({
-            key: 'eaten',
-            frames: 'boom',
-            frameRate: 20,
-            showOnStart: true,
-            hideOnComplete: true
-        });
-
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-            frameRate: 10,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: 'turn',
-            frames: [ { key: 'dude', frame: 4 } ],
-            frameRate: 20
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-            frameRate: 10,
-            repeat: -1
-        });
-    }
-
-    createSoundEffects(){
-        this.walk = this.sound.add('walk', {volume: 0.1});
-        this.eating = this.sound.add('humm')
-        this.burp = this.sound.add('burp')
-    }
-
-    createBackground() {
-        this.add.image(512, 340, "scene_1");
-    }
-
-    createPlatforms() {
-        this.platforms = this.physics.add.staticGroup();
-        this.platforms.create(500, 768, "ground").setScale(3).refreshBody();
-    }
-
-    createPlayer() {
-        this.player = this.physics.add.sprite(100, 550, "dude");
-        this.player.setCollideWorldBounds(true);
-    }
-
-    createExplosion() {
-        this.explosion = this.add.sprite(0, 0, "boom").setVisible(true);
-    }
-
-    playWalkSound(){
-        if (!this.walk.isPlaying)
-        {
-            this.walk.play();
-        }
-    }
-
-    handlePlayerMovement() {
-        const { left, right } = this.cursors;
-
-        if (left.isDown) {
-            this.player.setVelocityX(-160);
-            this.player.anims.play("left", true);
-            this.playWalkSound()
-        } else if (right.isDown) {
-            this.player.setVelocityX(160);
-            this.player.anims.play("right", true);
-            this.playWalkSound()
-        } else {
-            this.player.setVelocityX(0);
-            this.player.anims.play("turn");
-        }
-    }
-
-    checkFoodBounds() {
-        const { world } = this.physics;
-        for (let i = this.active.length - 1; i >= 0; i--) {
-            const food = this.active[i];
-
-            if (food && food.y > 700) {
-                this.recycleFood(food);
-            }
-        }
-    }
-
-    createPool() {
-        for (let i = 0; i < 5; i++) {
-            this.healthyPool.push(this.physics.add.sprite(0, 0, 'apple').setActive(false).setVisible(false));
-            this.unhealthyPool.push(this.physics.add.sprite(0, 0, 'donut').setActive(false).setVisible(false));
-        }
-    }
-    
-    releaseFood() {
-        let pool, frames;
-        if (Phaser.Math.Between(0, 1) === 0) {
-            pool = this.healthyPool;
-            frames = ["apple", "bananas", "watermelon"];
-        } else {
-            pool = this.unhealthyPool;
-            frames = ["donut", "pizza", "chips"];
-        }
-    
-        const food = pool.find(f => !f.active);
-        if (food) {
-            food.setTexture(Phaser.Utils.Array.GetRandom(frames));
-            food.setPosition(Phaser.Math.Between(0, 800), Phaser.Math.Between(-1200, 0));
-            food.setActive(true).setVisible(true).setVelocity(0, Phaser.Math.Between(100, 200));
-    
-            this.active.push(food);
-        }
-    }
-    
-    handleFoodCollisions() {
-        this.physics.add.collider(this.player, this.platforms);
-        this.physics.add.overlap(this.player, this.healthyPool, this.collectHealthyFood, null, this);
-        this.physics.add.overlap(this.player, this.unhealthyPool, this.collectUnhealthyFood, null, this);
-    }
-
-    collectHealthyFood(player, food) {
-        console.log("Collected healthy food");
-        if (!this.eating.isPlaying)
-        {
-            this.eating.play();
-        }
-        //this.explosion.copyPosition(food).play('eaten');
+      if (food && food.y > 700) {
         this.recycleFood(food);
+      }
+    }
+  }
+
+  createPool() {
+    for (let i = 0; i < 5; i++) {
+      this.healthyPool.push(
+        this.physics.add
+          .sprite(0, 0, "apple")
+          .setActive(false)
+          .setVisible(false)
+      );
+      this.unhealthyPool.push(
+        this.physics.add
+          .sprite(0, 0, "donut")
+          .setActive(false)
+          .setVisible(false)
+      );
+    }
+  }
+
+  releaseFood() {
+    let pool, frames;
+    if (Phaser.Math.Between(0, 1) === 0) {
+      pool = this.healthyPool;
+      frames = ["apple", "bananas", "watermelon"];
+    } else {
+      pool = this.unhealthyPool;
+      frames = ["donut", "pizza", "chips"];
     }
 
-    collectUnhealthyFood(player, food) {
-        console.log("Collected unhealthy food");
-        this.explosion.copyPosition(food).play('eaten');
-        if (!this.burp.isPlaying)
-        {
-            this.burp.play();
-        }
-        this.recycleFood(food);
+    const food = pool.find((f) => !f.active);
+    if (food) {
+      food.setTexture(Phaser.Utils.Array.GetRandom(frames));
+      food.setPosition(
+        Phaser.Math.Between(0, 800),
+        Phaser.Math.Between(-1200, 0)
+      );
+      food
+        .setActive(true)
+        .setVisible(true)
+        .setVelocity(0, Phaser.Math.Between(100, 200));
+
+      this.active.push(food);
     }
-    
-    recycleFood(food) {
-        food.setActive(false).setVisible(false);
-        this.active.splice(this.active.indexOf(food), 1);
+  }
+
+  handleFoodCollisions() {
+    this.physics.add.collider(this.player, this.platforms);
+    this.physics.add.overlap(
+      this.player,
+      this.healthyPool,
+      this.collectHealthyFood,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.player,
+      this.unhealthyPool,
+      this.collectUnhealthyFood,
+      null,
+      this
+    );
+  }
+
+  collectHealthyFood(player, food) {
+    console.log("Collected healthy food");
+    this.player = this.physics.remove.sprite(100, 550, "dude");
+    this.player = this.physics.add.sprite(100, 550, "dude_l");
+    if (!this.eating.isPlaying) {
+      this.eating.play();
     }
+    //this.explosion.copyPosition(food).play('eaten');
+    this.recycleFood(food);
+  }
+
+  collectUnhealthyFood(player, food) {
+    console.log("Collected unhealthy food");
+    this.explosion.copyPosition(food).play("eaten");
+    if (!this.burp.isPlaying) {
+      this.burp.play();
+    }
+    this.recycleFood(food);
+  }
+
+  recycleFood(food) {
+    food.setActive(false).setVisible(false);
+    this.active.splice(this.active.indexOf(food), 1);
+  }
+
+  nextScene() {
+    //this.scene.start("GameOver");
+  }
 }

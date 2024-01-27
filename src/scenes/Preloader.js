@@ -47,9 +47,14 @@ export class Preloader extends Scene {
       frameHeight: 192,
     });
 
-    this.load.audio('walk', 'sounds/steps.wav');
-    this.load.audio('humm', 'sounds/humm.wav');
-    this.load.audio('burp', 'sounds/burp.mp3');
+    this.load.spritesheet("dude_l", "dude_l.png", {
+      frameWidth: 128,
+      frameHeight: 192,
+    });
+
+    this.load.audio("walk", "sounds/steps.wav");
+    this.load.audio("humm", "sounds/humm.wav");
+    this.load.audio("burp", "sounds/burp.mp3");
   }
 
   create() {
