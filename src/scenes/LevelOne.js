@@ -15,6 +15,7 @@ export class LevelOne extends Scene {
 
     create() {
         this.createAnimations();
+        this.createSoundEffects();
         this.createBackground();
         this.createPlatforms();
         this.createPlayer();
@@ -69,6 +70,12 @@ export class LevelOne extends Scene {
         });
     }
 
+    createSoundEffects(){
+        this.walk = this.sound.add('walk', {volume: 0.1});
+        this.eating = this.sound.add('humm')
+        this.burp = this.sound.add('burp')
+    }
+
     createBackground() {
         this.add.image(512, 340, "scene_1");
     }
@@ -87,15 +94,24 @@ export class LevelOne extends Scene {
         this.explosion = this.add.sprite(0, 0, "boom").setVisible(true);
     }
 
+    playWalkSound(){
+        if (!this.walk.isPlaying)
+        {
+            this.walk.play();
+        }
+    }
+
     handlePlayerMovement() {
         const { left, right } = this.cursors;
 
         if (left.isDown) {
             this.player.setVelocityX(-160);
             this.player.anims.play("left", true);
+            this.playWalkSound()
         } else if (right.isDown) {
             this.player.setVelocityX(160);
             this.player.anims.play("right", true);
+            this.playWalkSound()
         } else {
             this.player.setVelocityX(0);
             this.player.anims.play("turn");
@@ -148,6 +164,10 @@ export class LevelOne extends Scene {
 
     collectHealthyFood(player, food) {
         console.log("Collected healthy food");
+        if (!this.eating.isPlaying)
+        {
+            this.eating.play();
+        }
         //this.explosion.copyPosition(food).play('eaten');
         this.recycleFood(food);
     }
@@ -155,6 +175,10 @@ export class LevelOne extends Scene {
     collectUnhealthyFood(player, food) {
         console.log("Collected unhealthy food");
         this.explosion.copyPosition(food).play('eaten');
+        if (!this.burp.isPlaying)
+        {
+            this.burp.play();
+        }
         this.recycleFood(food);
     }
     
