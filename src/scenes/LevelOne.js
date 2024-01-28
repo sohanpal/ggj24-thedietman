@@ -4,6 +4,7 @@ export class LevelOne extends Scene {
   cursors;
   player;
   explosion;
+  dude_dies;
   platforms;
   timedEvent;
   text;
@@ -108,7 +109,7 @@ export class LevelOne extends Scene {
 
   createPlatforms() {
     this.platforms = this.physics.add.staticGroup();
-    this.platforms.create(500, 768, "ground").setScale(3).refreshBody();
+    this.platforms.create(400, 575, "ground").setScale(3).refreshBody();
   }
 
   createPlayer() {
@@ -117,7 +118,7 @@ export class LevelOne extends Scene {
   }
 
   createExplosion() {
-    this.explosion = this.add.sprite(0, 0, "boom").setVisible(true);
+    this.explosion = this.add.sprite(0, 0, "boom").setVisible(false);
   }
 
   playWalkSound() {
@@ -155,7 +156,7 @@ export class LevelOne extends Scene {
   }
 
   createPool() {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       this.healthyPool.push(
         this.physics.add
           .sprite(0, 0, "apple")
@@ -173,7 +174,7 @@ export class LevelOne extends Scene {
 
   releaseFood() {
     let pool, frames;
-    if (Phaser.Math.Between(0, 1) === 0) {
+    if (Phaser.Math.Between(0, 10) === 0) {
       pool = this.healthyPool;
       frames = ["apple", "bananas", "watermelon"];
     } else {
@@ -213,10 +214,12 @@ export class LevelOne extends Scene {
       null,
       this
     );
+    console.log(this.score);
   }
 
   collectHealthyFood(player, food) {
     console.log("Collected healthy food");
+    this.explosion.copyPosition(food).play("eaten");
     if (!this.eating.isPlaying) {
       this.score--;
       this.eating.play();
@@ -227,7 +230,6 @@ export class LevelOne extends Scene {
 
   collectUnhealthyFood(player, food) {
     console.log("Collected unhealthy food");
-
     this.explosion.copyPosition(food).play("eaten");
     if (!this.burp.isPlaying) {
       this.score++;
@@ -243,9 +245,9 @@ export class LevelOne extends Scene {
       this.createAnimationPerson("dude_s");
     } else if (this.score > 2 && this.score < 4) {
       this.createAnimationPerson("dude_m");
-    } else if (this.score >= 4) {
+    } else if ((this.score = 4)) {
       this.createAnimationPerson("dude_l");
-    } else if (this.score > 5) {
+    } else if ((this.score = 5)) {
       this.nextScene();
     }
   }
