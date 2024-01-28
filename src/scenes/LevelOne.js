@@ -243,8 +243,10 @@ export class LevelOne extends Scene {
       this.createAnimationPerson("dude_s");
     } else if (this.score > 2 && this.score < 4) {
       this.createAnimationPerson("dude_m");
-    } else if (this.score > 4) {
+    } else if (this.score >= 4) {
       this.createAnimationPerson("dude_l");
+    } else if (this.score > 5) {
+      this.nextScene();
     }
   }
 
@@ -254,6 +256,6 @@ export class LevelOne extends Scene {
   }
 
   nextScene() {
-    //this.scene.start("GameOver");
+    this.scene.start("GameOver");
   }
 }
