@@ -10,7 +10,6 @@ export class Game extends Scene {
 
   create() {
     this.add.image(400, 300, "dead_bg");
-
     this.add
       .text(
         400,
