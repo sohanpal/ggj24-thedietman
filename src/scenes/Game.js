@@ -27,3 +27,14 @@ export class Game extends Scene {
     });
   }
 }
+Restaurant Backgrounds:
+https://lornn.itch.io/backgrounds-restaurants-and-cafes
+
+Emojis:
+https://kaboff.itch.io/128-emoji-pixel-art
+
+Chubby Character:
+https://opengameart.org/content/bob
+
+Smoke Animations:
+https://pimen.itch.io/smoke-vfx-1
