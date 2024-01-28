@@ -12,14 +12,19 @@ export class Game extends Scene {
     this.add.image(400, 300, "dead_bg");
 
     this.add
-      .text(400, 250, "Creadits :\nand share it with us:\nsupport@phaser.io", {
-        fontFamily: "Arial Black",
-        fontSize: 14,
-        color: "#ffffff",
-        stroke: "#000000",
-        strokeThickness: 8,
-        align: "center",
-      })
+      .text(
+        400,
+        310,
+        "Credits :\nRestaurant Backgrounds:\nhttps://lornn.itch.io/backgrounds-restaurants-and-cafes\nEmojis:\nhttps://kaboff.itch.io/128-emoji-pixel-art\nChubby Character:\nhttps://opengameart.org/content/bob\nSmoke Animations:\nhttps://pimen.itch.io/smoke-vfx-1\nSounds:\nPixbay.com\nmixkit.co\n",
+        {
+          fontFamily: "Arial Black",
+          fontSize: 14,
+          color: "#ffffff",
+          stroke: "#000000",
+          strokeThickness: 3,
+          align: "center",
+        }
+      )
       .setOrigin(0.5);
 
     this.input.once("pointerdown", () => {
@@ -27,14 +32,3 @@ export class Game extends Scene {
     });
   }
 }
-Restaurant Backgrounds:
-https://lornn.itch.io/backgrounds-restaurants-and-cafes
-
-Emojis:
-https://kaboff.itch.io/128-emoji-pixel-art
-
-Chubby Character:
-https://opengameart.org/content/bob
-
-Smoke Animations:
-https://pimen.itch.io/smoke-vfx-1
